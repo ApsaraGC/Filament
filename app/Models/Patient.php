@@ -33,4 +33,8 @@ class Patient extends Model
     {
         return $this->hasMany(Appointment::class);
     }
+    public function department(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Department::class);
+    }
 }

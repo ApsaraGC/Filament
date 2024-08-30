@@ -23,6 +23,7 @@ class SchedulePolicy
     public function view(User $user, Schedule $schedule): bool
     {
         //
+        return $user->role === 'patient' || $user->role === 'doctor' || $user->role === 'admin';
     }
 
     /**
@@ -31,6 +32,7 @@ class SchedulePolicy
     public function create(User $user): bool
     {
         //
+        return $user->role === 'doctor' || $user->role === 'patient' || $user->role === 'admin';
     }
 
     /**
@@ -39,6 +41,7 @@ class SchedulePolicy
     public function update(User $user, Schedule $schedule): bool
     {
         //
+        return $user->role === 'doctor' || $user->role === 'admin';
     }
 
     /**
@@ -47,6 +50,7 @@ class SchedulePolicy
     public function delete(User $user, Schedule $schedule): bool
     {
         //
+        return $user->role === 'admin';
     }
 
     /**
@@ -55,6 +59,7 @@ class SchedulePolicy
     public function restore(User $user, Schedule $schedule): bool
     {
         //
+        return $user->role === 'admin';
     }
 
     /**
@@ -63,5 +68,6 @@ class SchedulePolicy
     public function forceDelete(User $user, Schedule $schedule): bool
     {
         //
+        return $user->role === 'admin';
     }
 }

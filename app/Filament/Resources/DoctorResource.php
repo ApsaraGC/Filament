@@ -19,6 +19,7 @@ use Filament\Infolists\Components\ColorEntry;
 use Filament\Support\Enums\FontFamily;
 use Filament\Support\Enums\FontWeight;
 use Filament\Infolists\Components\ImageEntry;
+
 class DoctorResource extends Resource
 {
     protected static ?string $model = Doctor::class;
@@ -89,6 +90,7 @@ class DoctorResource extends Resource
                 //
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
@@ -168,6 +170,7 @@ class DoctorResource extends Resource
         return [
             'index' => Pages\ListDoctors::route('/'),
             'create' => Pages\CreateDoctor::route('/create'),
+            'view' => Pages\ViewDoctor::route('/{record}'),
             'edit' => Pages\EditDoctor::route('/{record}/edit'),
         ];
     }

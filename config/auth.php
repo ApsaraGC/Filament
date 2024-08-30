@@ -112,4 +112,46 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    'admin' => [
+        'driver' => 'session',
+        'provider' => 'admins',
+    ],
+    'patient' => [
+        'driver' => 'session',
+        'provider' => 'patients',
+    ],
+    'doctor' => [
+        'driver' => 'session',
+        'provider' => 'doctors',
+    ],
+'providers' => [
+    'users' => [
+        'driver' => 'eloquent',
+        'model' => App\Models\User::class,
+    ],
+    'admins' => [
+        'driver' => 'eloquent',
+        'model' => App\Models\User::class,
+        'table' => 'users',
+        'where' => [
+            ['role', '=', 'admin'],
+        ],
+    ],
+    'patients' => [
+        'driver' => 'eloquent',
+        'model' => App\Models\User::class,
+        'table' => 'users',
+        'where' => [
+            ['role', '=', 'patient'],
+        ],
+    ],
+    'doctors' => [
+        'driver' => 'eloquent',
+        'model' => App\Models\User::class,
+        'table' => 'users',
+        'where' => [
+            ['role', '=', 'doctor'],
+        ],
+    ],
+],
 ];

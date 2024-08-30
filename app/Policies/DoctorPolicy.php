@@ -14,7 +14,8 @@ class DoctorPolicy
     public function viewAny(User $user): bool
     {
         //
-        return true;
+        //return true;
+        return $user->role === 'admin';
     }
 
     /**
@@ -23,6 +24,7 @@ class DoctorPolicy
     public function view(User $user, Doctor $doctor): bool
     {
         //
+        return $user->role === 'doctor' || $user->role === 'admin';
     }
 
     /**
@@ -31,7 +33,7 @@ class DoctorPolicy
     public function create(User $user): bool
     {
         //
-        return $user->hasRole('doctor');
+        return $user->role === 'doctor' || $user->role === 'admin';
     }
 
     /**
@@ -40,7 +42,7 @@ class DoctorPolicy
     public function update(User $user, Doctor $doctor): bool
     {
         //
-        return $user->hasRole('doctor') && $user->doctor->id === $doctor->id;
+        return $user->role === 'doctor' || $user->role === 'admin';
     }
 
     /**
@@ -49,7 +51,7 @@ class DoctorPolicy
     public function delete(User $user, Doctor $doctor): bool
     {
         //
-        return $user->hasRole('doctor') && $user->doctor->id === $doctor->id;
+        return  $user->role === 'admin';
     }
 
     /**
@@ -58,6 +60,7 @@ class DoctorPolicy
     public function restore(User $user, Doctor $doctor): bool
     {
         //
+        return  $user->role === 'admin';
     }
 
     /**
@@ -66,5 +69,6 @@ class DoctorPolicy
     public function forceDelete(User $user, Doctor $doctor): bool
     {
         //
+        return  $user->role === 'admin';
     }
 }

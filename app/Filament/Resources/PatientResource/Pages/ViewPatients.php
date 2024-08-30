@@ -6,7 +6,7 @@ use App\Filament\Resources\PatientResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 
-class ViewPatient extends ViewRecord
+class ViewPatients extends ViewRecord
 {
     protected static string $resource = PatientResource::class;
 

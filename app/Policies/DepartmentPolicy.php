@@ -15,6 +15,7 @@ class DepartmentPolicy
     {
         //
         return true;
+        //return $user->role === 'admin';
     }
 
     /**
@@ -23,7 +24,9 @@ class DepartmentPolicy
     public function view(User $user, Department $department): bool
     {
         //
-       // return $user->id === $department->user_id || $user->isAdmin();
+        //return true;
+       // return $user->id === $department->user_id ||  $user->isAdmin();
+       return $user->role === 'patient' || $user->role === 'admin';
     }
 
     /**
@@ -32,7 +35,8 @@ class DepartmentPolicy
     public function create(User $user): bool
     {
         //
-        return $user->hasRole('patient');
+        return true;
+       // return $user->hasRole('patient');
     }
 
     /**
@@ -41,6 +45,7 @@ class DepartmentPolicy
     public function update(User $user, Department $department): bool
     {
         //
+        return $user->role ==='admin';
     }
 
     /**

@@ -14,6 +14,7 @@ class AppointmentPolicy
     public function viewAny(User $user)
     {
         //
+        return $user->role === 'admin' || $user->role === 'patient' || $user->role === 'doctor';
     }
 
     /**
@@ -22,6 +23,7 @@ class AppointmentPolicy
     public function view(User $user, Appointment $appointment): bool
     {
         //
+        return $user->role === 'admin' || $user->role === 'patient' || $user->role === 'doctor';
     }
 
     /**
@@ -30,7 +32,7 @@ class AppointmentPolicy
     public function create(User $user): bool
     {
         //
-        return $user->hasRole('patient') && !empty($user->patient);
+        return $user->role === 'admin' || $user->role === 'patient';
     }
 
     /**
@@ -39,7 +41,7 @@ class AppointmentPolicy
     public function update(User $user, Appointment $appointment): bool
     {
         //
-        return $user->hasRole('patient') && $user->patient->id === $appointment->patient_id;
+        return $user->role === 'admin' || $user->role === 'patient';
     }
 
     /**
@@ -48,7 +50,7 @@ class AppointmentPolicy
     public function delete(User $user, Appointment $appointment): bool
     {
         //
-        return $user->hasRole('patient') && $user->patient->id === $appointment->patient_id;
+        return $user->role === 'admin' || $user->role === 'patient';
     }
 
     /**
@@ -57,6 +59,7 @@ class AppointmentPolicy
     public function restore(User $user, Appointment $appointment): bool
     {
         //
+        return $user->role === 'admin' || $user->role === 'patient';
     }
 
     /**
@@ -65,5 +68,6 @@ class AppointmentPolicy
     public function forceDelete(User $user, Appointment $appointment): bool
     {
         //
+        return $user->role === 'admin' || $user->role === 'patient';
     }
 }
