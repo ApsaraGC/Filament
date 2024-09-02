@@ -14,7 +14,7 @@ class DepartmentPolicy
     public function viewAny(User $user): bool
     {
         //
-        return true;
+        return $user->role ==='admin';
         //return $user->role === 'admin';
     }
 
@@ -35,8 +35,9 @@ class DepartmentPolicy
     public function create(User $user): bool
     {
         //
-        return true;
+        //return true;
        // return $user->hasRole('patient');
+       return $user->role ==='admin';
     }
 
     /**
@@ -54,6 +55,7 @@ class DepartmentPolicy
     public function delete(User $user, Department $department): bool
     {
         //
+        return $user->role ==='admin';
     }
 
     /**
@@ -62,6 +64,7 @@ class DepartmentPolicy
     public function restore(User $user, Department $department): bool
     {
         //
+        return $user->role ==='admin';
     }
 
     /**
@@ -70,5 +73,6 @@ class DepartmentPolicy
     public function forceDelete(User $user, Department $department): bool
     {
         //
+        return $user->role ==='admin';
     }
 }

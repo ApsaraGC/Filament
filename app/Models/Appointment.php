@@ -30,4 +30,11 @@ class Appointment extends Model
     {
         return $this->belongsTo(Department::class);
     }
+    // In App\Models\Appointment.php
+
+public function canReschedule(): bool
+{
+    return auth()->check() && auth()->user()->id === $this->doctor->user_id;
+}
+
 }

@@ -31,7 +31,7 @@ class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-users';
 
     public static function form(Form $form): Form
     {
@@ -143,7 +143,7 @@ public static function infolist(Infolist $infolist): Infolist
                 ]),
             Section::make('Timestamps')
                 ->schema([
-                    
+
                     TextEntry::make('created_at')
                         ->label('Created At')
                         ->dateTime(),

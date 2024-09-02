@@ -7,6 +7,7 @@ use App\Filament\Resources\AppointmentResource\RelationManagers;
 use App\Models\Appointment;
 use App\Models\Department;
 use App\Models\Doctor;
+use App\Models\Notification;
 use App\Models\Patient;
 use Carbon\Carbon;
 use Filament\Forms;
@@ -32,7 +33,7 @@ class AppointmentResource extends Resource
 {
     protected static ?string $model = Appointment::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-calendar';
 
     public static function form(Form $form): Form
     {
@@ -158,7 +159,29 @@ class AppointmentResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-            ])
+                Tables\Actions\Action::make('reschedule')
+                ->label('Reschedule')
+                ->icon('heroicon-o-calendar')
+                ->action(function (Appointment $record, array $data) {
+                    if (!$record->canReschedule()) {
+                        abort(403, 'You are not authorized to reschedule this appointment.');
+                    }
+
+                    $record->date_time = Carbon::parse($data['date_time']);
+                    $record->save();
+
+                    // Send notification to the patient
+                    $record->patient->user->notify(new Notification($record));
+                })
+                ->form([
+                    Forms\Components\DateTimePicker::make('date_time')
+                        ->label('New Appointment Date & Time')
+                        ->required(),
+                ])
+                ->visible(fn (Appointment $record) => $record->canReschedule()),
+        ])
+
+
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
