@@ -36,5 +36,9 @@ public function canReschedule(): bool
 {
     return auth()->check() && auth()->user()->id === $this->doctor->user_id;
 }
+public function schedule()
+{
+    return $this->belongsTo(Schedule::class);
+}
 
 }

@@ -4,12 +4,16 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ScheduleResource\Pages;
 use App\Filament\Resources\ScheduleResource\RelationManagers;
+use App\Models\Doctor;
 use App\Models\Schedule;
+use App\Models\User;
 use Filament\Forms;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Container\Attributes\Auth;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -23,9 +27,15 @@ class ScheduleResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('doctor_id')
-                    ->required()
-                    ->numeric(),
+                Forms\Components\Select::make('doctor_id')
+                ->label('Doctor')
+                ->options(function () {
+                    $patients = Doctor::with('user')->get();
+                    return $patients->pluck('user.name', 'id')->filter(function ($name) {
+                        return !is_null($name);
+                    })->toArray();
+                })
+                ->required(),
                 Forms\Components\DateTimePicker::make('available_from')
                     ->required(),
                 Forms\Components\DateTimePicker::make('available_to')
@@ -40,6 +50,7 @@ class ScheduleResource extends Resource
                 Tables\Columns\TextColumn::make('doctor_id')
                     ->numeric()
                     ->sortable(),
+                    
                 Tables\Columns\TextColumn::make('available_from')
                     ->dateTime()
                     ->sortable(),

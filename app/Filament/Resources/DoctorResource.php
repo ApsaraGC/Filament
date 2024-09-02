@@ -57,6 +57,12 @@ class DoctorResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+        // ->query(function (Builder $query) {
+        //     $doctorId = auth()->user()->doctor->id ?? null;
+        //     if ($doctorId) {
+        //         $query->where('id', $doctorId);
+        //     }
+        // })
             ->columns([
                 Tables\Columns\TextColumn::make('user_id')
                     ->numeric()
@@ -96,9 +102,12 @@ class DoctorResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ]);
+                ])
+            ])
+
+            ;
     }
+
     public static function infolist(Infolist $infolist): Infolist
     {
         return $infolist

@@ -151,6 +151,8 @@ class profile extends Page implements HasForms
                 'experience' => $formState['doctor']['experience'],
                 'gender' => $formState['doctor']['gender'], // Ensure this line is included
                 'image' => $formState['doctor']['image'],
+                'phone_number'=>$formState['doctor']['phone_number'],
+
                 ]
             );
         } elseif ($user->role === 'patient') {
@@ -163,6 +165,9 @@ class profile extends Page implements HasForms
                     'age' => $formState['patient']['age'],
                     'gender' => $formState['patient']['gender'],
                     'number' => $formState['patient']['number'],
+                    'address'=>$formState['patient']['address'],
+                    'description'=>$formState['patient']['description'],
+
                 ]
             );
         }

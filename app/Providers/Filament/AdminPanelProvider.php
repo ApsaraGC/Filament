@@ -19,6 +19,9 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use App\Filament\Pages\Auth\Register;
 use App\Filament\Pages\profile;
+
+use App\Filament\Widgets\DasDoctorInfoWidgets;
+use App\Filament\Widgets\DasPatientInfoWidgets;
 use Filament\Navigation\MenuItem;
 
 class AdminPanelProvider extends PanelProvider
@@ -31,6 +34,13 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->registration(Register::class)
+            ->widgets([
+                DasDoctorInfoWidgets::class,
+            ])
+
+            ->widgets([
+               DasPatientInfoWidgets::class,
+            ])
             ->userMenuItems([
                 MenuItem::make()
                     ->label('Profile')
@@ -39,11 +49,13 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->colors([
                 'primary' => Color::Amber,
+                'secondary' => Color::Blue,
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
-                Pages\Dashboard::class,
+
+               Pages\Dashboard::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([

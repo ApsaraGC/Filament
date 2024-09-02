@@ -24,4 +24,8 @@ class Doctor extends Model
          //1 doctor has many appointment
         return $this->hasMany(Appointment::class);//one to many
     }
+    public function schedules()
+    {
+        return $this->hasMany(Schedule::class);
+    }
 }

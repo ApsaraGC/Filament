@@ -101,12 +101,20 @@ class PatientResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                Tables\Actions\ViewAction::make()
+                ->button()
+    ->color('primary')
+    ->icon('heroicon-o-eye')
+    ->extraAttributes(['class' => 'bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded']),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                    ->button()
+    // ->color('secondary')
+    // ->icon('heroicon-o-pencil')
+    // ->extraAttributes(['class' => 'bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded']),,
                 ]),
             ]);
     }
@@ -149,6 +157,8 @@ class PatientResource extends Resource
                     ->weight(FontWeight::Bold)
 
                     ->fontFamily(FontFamily::Sans),
+                    TextEntry::make('schedule.formatted_time')
+                    ->label('Scheduled Time'),
                     TextEntry::make('created_at')
                     ->label('Created At')
                     ->icon('heroicon-m-calendar')

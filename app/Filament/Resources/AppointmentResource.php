@@ -9,6 +9,7 @@ use App\Models\Department;
 use App\Models\Doctor;
 use App\Models\Notification;
 use App\Models\Patient;
+use App\Models\Schedule;
 use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
@@ -28,6 +29,7 @@ use Filament\Infolists\Components\ColorEntry;
 use Filament\Support\Enums\FontFamily;
 use Filament\Support\Enums\FontWeight;
 use Filament\Infolists\Components\ImageEntry;
+use Illuminate\Support\Facades\Auth;
 
 class AppointmentResource extends Resource
 {
@@ -48,40 +50,91 @@ class AppointmentResource extends Resource
                     })->toArray();
                 })
                 ->required(),
-            Forms\Components\Select::make('doctor_id')
-                ->label('Doctor')
-                ->options(function () {
-                    $doctors = Doctor::with('user', 'department')->get();
-                    return $doctors->pluck('user.name', 'id')->filter(function ($name) {
-                        return !is_null($name);
-                    })->toArray();
-                })
-                ->required()
+            Forms\Components\Select::make('department_id')
+            ->label('Department')
+            ->options(function () {
+                return Department::all()->pluck('name', 'id')->toArray();
+            })
+            ->required()
+            ->reactive()
+            ->afterStateUpdated(function ($state, callable $set) {
+                $set('doctor_id', null);
+            }),
+
+        Forms\Components\Select::make('doctor_id')
+            ->label('Doctor')
+            ->options(function (callable $get) {
+                $departmentId = $get('department_id');
+                if ($departmentId) {
+                    return Doctor::where('department_id', $departmentId)
+                        ->with('user')
+                        ->get()
+                        ->pluck('user.name', 'id')
+                        ->filter(function ($name) {
+                            return !is_null($name);
+                        })->toArray();
+                }
+                return [];
+            })
+            ->required()
+            ->required()
                 ->reactive()
                 ->afterStateUpdated(function ($state, callable $set) {
-                    $doctor = Doctor::find($state);
-                    if ($doctor && $doctor->department) {
-                        $set('department_id', $doctor->department->id);
-                    } else {
-                        $set('department_id', null);
-                    }
+                    $set('schedule_id', null);
                 }),
-            Forms\Components\Select::make('department_id')
-                ->label('Department')
-                ->options(function () {
-                    return Department::all()->pluck('name', 'id')->toArray();
-                })
-                ->required(),
+            // Forms\Components\Select::make('schedule_id')
+            //     ->label('Available Schedule')
+            //     ->options(function (callable $get) {
+            //         $doctorId = $get('doctor_id');
+            //         if ($doctorId) {
+            //             return \App\Models\Schedule::where('doctor_id', $doctorId)
+            //                 ->get()
+            //                 ->pluck('formatted_time', 'id')  // Display formatted time
+            //                 ->toArray();
+            //         }
+            //         return [];
+            //     })
+                // ->required(),
+
                 // ->disabled(),
             Forms\Components\TextInput::make('status')
                 ->required(),
             Forms\Components\DateTimePicker::make('date_time')
                 ->required(),
-        ]);
+            Forms\Components\TextInput::make('appointment_date')
+                ->required(),
+                // Table to display schedules
+            Forms\Components\Placeholder::make('schedules_table')
+            ->label('Doctor’s Schedules')
+            ->content(function (callable $get) {
+                $doctorId = $get('doctor_id');
+                if ($doctorId) {
+                    $schedules = Schedule::where('doctor_id', $doctorId)->get();
+                    return view('partials.schedules_table', ['schedules' => $schedules]);
+                }
+                return '';
+            }),
+            // Add other fields as necessary
+        ]);;
     }
     public static function table(Table $table): Table
     {
+        $user = Auth::user();
+        $isDoctor = $user->hasRole('doctor');
+        $isPatient = $user->hasRole('patient');
+        //$doctorId = $isDoctor ? Doctor::where('user_id', $user->id)->value('id') : null;
         return $table
+        ->modifyQueryUsing(function (Builder $query) use ($isDoctor, $isPatient, $user) {
+            if ($isDoctor) {
+                $doctorId = Doctor::where('user_id', $user->id)->value('id');
+                $query->where('doctor_id', $doctorId);
+            } elseif ($isPatient) {
+                $patientId = Patient::where('user_id', $user->id)->value('id');
+                $query->where('patient_id', $patientId);
+            } elseif (auth()->user()->role === 'admin') {
+                // Admins can see all appointments
+            }
+        })
             ->columns([
                 Tables\Columns\TextColumn::make('patient.user.name')
                     ->label('Patient Name')
@@ -171,7 +224,7 @@ class AppointmentResource extends Resource
                     $record->save();
 
                     // Send notification to the patient
-                    $record->patient->user->notify(new Notification($record));
+                    $record->patient->user->notify(new Notification());
                 })
                 ->form([
                     Forms\Components\DateTimePicker::make('date_time')
@@ -186,8 +239,16 @@ class AppointmentResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            // ->query(function (Builder $query) use ($doctorId) {
+            //     if ($doctorId) {
+            //         $query->where('doctor_id', $doctorId);
+            //     }
+            // })
+            ;
+
     }
+//
     public static function infolist(Infolist $infolist): Infolist
     {
         return $infolist
