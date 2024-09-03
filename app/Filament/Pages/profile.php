@@ -94,6 +94,9 @@ class profile extends Page implements HasForms
                 TextInput::make('patient.number')
                 ->required()
                 ->default($user->patient->number ?? ''),
+                 TextInput::make('patient.description')
+                 ->required()
+                 ->default($user->patient->description ?? ''),
                 Select::make('patient.gender')
                     ->options([
                         'male' => 'Male',

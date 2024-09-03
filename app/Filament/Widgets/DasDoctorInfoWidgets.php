@@ -26,8 +26,8 @@ class DasDoctorInfoWidgets extends BaseWidget
 
 
             return [
-                Stat::make('Appointments Today', $todayAppointments)
-                    ->description('Appointments scheduled for today')
+                Stat::make('Your Appointments Today', $todayAppointments)
+                    ->description('Total Appointments')
                     ->color('success')
                     ->chart([0, $todayAppointments]),
 

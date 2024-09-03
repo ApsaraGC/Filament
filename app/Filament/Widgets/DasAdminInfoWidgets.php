@@ -1,10 +1,15 @@
 <?php
 
-namespace App\Filament\Resources\WidgetsResource\Widgets;
+namespace App\Filament\Widgets;
 
 use Filament\Widgets\Widget;
+use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 
-class DasAdminInfoWidgets extends Widget
+class DasAdminInfoWidgets extends BaseWidget
 {
-    protected static string $view = 'filament.resources.widgets-resource.widgets.das-admin-info-widgets';
+    protected static string $view = 'filament.widgets.das-admin-info-widgets';
+    public static function canView(): bool
+    {
+        return auth()->user()->role === 'admin';
+    }
 }

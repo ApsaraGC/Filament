@@ -7,13 +7,14 @@ use App\Filament\Resources\AppointmentResource\RelationManagers;
 use App\Models\Appointment;
 use App\Models\Department;
 use App\Models\Doctor;
-use App\Models\Notification;
 use App\Models\Patient;
 use App\Models\Schedule;
 use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Form;
+use Filament\Notifications\Events\DatabaseNotificationsSent;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Filters\Filter;
@@ -29,6 +30,8 @@ use Filament\Infolists\Components\ColorEntry;
 use Filament\Support\Enums\FontFamily;
 use Filament\Support\Enums\FontWeight;
 use Filament\Infolists\Components\ImageEntry;
+use Filament\Notifications\DatabaseNotification;
+use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Auth;
 
 class AppointmentResource extends Resource
@@ -82,27 +85,13 @@ class AppointmentResource extends Resource
                 ->afterStateUpdated(function ($state, callable $set) {
                     $set('schedule_id', null);
                 }),
-            // Forms\Components\Select::make('schedule_id')
-            //     ->label('Available Schedule')
-            //     ->options(function (callable $get) {
-            //         $doctorId = $get('doctor_id');
-            //         if ($doctorId) {
-            //             return \App\Models\Schedule::where('doctor_id', $doctorId)
-            //                 ->get()
-            //                 ->pluck('formatted_time', 'id')  // Display formatted time
-            //                 ->toArray();
-            //         }
-            //         return [];
-            //     })
-                // ->required(),
 
-                // ->disabled(),
             Forms\Components\TextInput::make('status')
                 ->required(),
             Forms\Components\DateTimePicker::make('date_time')
                 ->required(),
-            Forms\Components\TextInput::make('appointment_date')
-                ->required(),
+            // Forms\Components\TextInput::make('appointment_date')
+            //     ->required(),
                 // Table to display schedules
             Forms\Components\Placeholder::make('schedules_table')
             ->label('Doctor’s Schedules')
@@ -114,7 +103,8 @@ class AppointmentResource extends Resource
                 }
                 return '';
             }),
-            // Add other fields as necessary
+
+
         ]);;
     }
     public static function table(Table $table): Table
@@ -158,6 +148,35 @@ class AppointmentResource extends Resource
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+            ])
+            ->actions([
+                Tables\Actions\EditAction::make(),
+            Tables\Actions\Action::make('Reshedule')
+                    ->visible(fn($record) => auth()->user()->role === 'doctor')
+                    ->form(function ($record) {
+                        return [
+                            DateTimePicker::make('date_time')
+                                ->default($record->date_time)
+                                // ->native(false)
+                        ];
+                    })
+                    ->action(function ($record, $data) {
+                        $previouse_date_time = $record->date_time;
+                        $record->date_time = $data['date_time'];
+                        $record->save();
+                        Notification::make()
+                            ->title('Appointment rescheduled')
+                            ->body("Hello "   .$record->patient->user->name." your appointment scheduled for " . $previouse_date_time . " with " . $record->doctor->user->name . " has been rescheduled for " . $record->date_time .
+                                "Apologies for the inconvenience. Please check the new time. Thank you!")
+                            ->success()
+                            ->duration(10)
+
+                            ->sendToDatabase($record->patient->user);
+                        event(new DatabaseNotificationsSent($record->patient->user));
+                    })
+                    ->icon('heroicon-m-clock')
+                    ->color('warning'),
+
             ])
             ->filters([
                 //
@@ -210,29 +229,8 @@ class AppointmentResource extends Resource
                     })
 
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\Action::make('reschedule')
-                ->label('Reschedule')
-                ->icon('heroicon-o-calendar')
-                ->action(function (Appointment $record, array $data) {
-                    if (!$record->canReschedule()) {
-                        abort(403, 'You are not authorized to reschedule this appointment.');
-                    }
 
-                    $record->date_time = Carbon::parse($data['date_time']);
-                    $record->save();
 
-                    // Send notification to the patient
-                    $record->patient->user->notify(new Notification());
-                })
-                ->form([
-                    Forms\Components\DateTimePicker::make('date_time')
-                        ->label('New Appointment Date & Time')
-                        ->required(),
-                ])
-                ->visible(fn (Appointment $record) => $record->canReschedule()),
-        ])
 
 
             ->bulkActions([

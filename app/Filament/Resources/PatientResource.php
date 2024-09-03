@@ -86,6 +86,8 @@ class PatientResource extends Resource
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+                    Tables\Columns\TextColumn::make('description')
+                    ->label('Description'),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
@@ -157,6 +159,10 @@ class PatientResource extends Resource
                     ->weight(FontWeight::Bold)
 
                     ->fontFamily(FontFamily::Sans),
+                    TextEntry::make('description')
+                    ->color('sucesss')
+                    ->weight(FontWeight::Bold
+            ),
                     TextEntry::make('schedule.formatted_time')
                     ->label('Scheduled Time'),
                     TextEntry::make('created_at')

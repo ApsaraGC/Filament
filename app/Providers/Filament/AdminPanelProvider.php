@@ -19,7 +19,7 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use App\Filament\Pages\Auth\Register;
 use App\Filament\Pages\profile;
-
+use App\Filament\Widgets\DasAdminInfoWidgets;
 use App\Filament\Widgets\DasDoctorInfoWidgets;
 use App\Filament\Widgets\DasPatientInfoWidgets;
 use Filament\Navigation\MenuItem;
@@ -33,13 +33,23 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+             //->brandName('𝓗𝓪𝓷𝓪𝓰 𝓗𝓸𝓼𝓹𝓲𝓽𝓪𝓵')
+
+            ->brandLogo(asset('images/hanag.png'))
+            ->brandLogoHeight('60px')
+
             ->registration(Register::class)
+            ->databaseNotifications()
+            ->databaseNotificationsPolling('2s')
             ->widgets([
                 DasDoctorInfoWidgets::class,
             ])
 
             ->widgets([
                DasPatientInfoWidgets::class,
+            ])
+            ->widgets([
+                DasAdminInfoWidgets::class,
             ])
             ->userMenuItems([
                 MenuItem::make()
@@ -59,7 +69,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
-                Widgets\AccountWidget::class,
+               // Widgets\AccountWidget::class,
                 // Widgets\FilamentInfoWidget::class,
             ])
             ->middleware([
