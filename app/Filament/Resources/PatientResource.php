@@ -41,7 +41,7 @@ class PatientResource extends Resource
                 Forms\Components\TextInput::make('number')
                     ->required()
                     ->label('Phone Number')
-                    ->icon('heroicon-m-phone')
+
                     ->numeric(),
                 Forms\Components\TextInput::make('age')
                     ->required()
@@ -63,6 +63,7 @@ class PatientResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+
             ->columns([
                 Tables\Columns\TextColumn::make('user.name')
                     ->numeric()
@@ -86,7 +87,7 @@ class PatientResource extends Resource
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                    Tables\Columns\TextColumn::make('description')
+                Tables\Columns\TextColumn::make('description')
                     ->label('Description'),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()
@@ -104,19 +105,23 @@ class PatientResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()
-                ->button()
-    ->color('primary')
-    ->icon('heroicon-o-eye')
-    ->extraAttributes(['class' => 'bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded']),
-                Tables\Actions\EditAction::make(),
+                    ->button()
+                    ->color('primary')
+                    ->icon('heroicon-o-eye')
+                    ->extraAttributes(['class' => 'bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded']),
+
+                Tables\Actions\EditAction::make()
+                    ->icon('heroicon-o-pencil')
+                    ->color('primary')
+                    ->button(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
-                    ->button()
-    // ->color('secondary')
-    // ->icon('heroicon-o-pencil')
-    // ->extraAttributes(['class' => 'bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded']),,
+                        ->button()
+                    // ->color('secondary')
+                    // ->icon('heroicon-o-pencil')
+                    // ->extraAttributes(['class' => 'bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded']),,
                 ]),
             ]);
     }
@@ -124,6 +129,7 @@ class PatientResource extends Resource
     public static function infolist(Infolist $infolist): Infolist
     {
         return $infolist
+
             ->schema([
 
                 TextEntry::make('user.name')->tooltip('Patient Name')
@@ -137,19 +143,22 @@ class PatientResource extends Resource
                 TextEntry::make('user.email')
                     ->icon('heroicon-m-envelope')
                     ->iconColor('primary')
-                    ->label('Email'),
+                    ->label('Email')
+                    ->color('primary'),
                 TextEntry::make("id")
                     ->label('Patient ID')
-                    ->color('success')
-                    ->weight(FontWeight::Light)
+                    ->color('primary')
+                    ->icon('heroicon-o-identification')
+                    ->weight(FontWeight::Bold)
                     ->fontFamily(FontFamily::Serif),
                 TextEntry::make('address')
                     ->weight(FontWeight::Bold)
+                    ->icon('heroicon-o-home')
                     ->fontFamily(FontFamily::Sans)
                     ->color('success'),
                 TextEntry::make('gender')
                     ->color('success')
-                    ->icon('heroicon-m-question-mark-circle')
+                    ->icon('heroicon-o-user')
                     ->weight(FontWeight::Bold)
 
                     ->fontFamily(FontFamily::Sans),
@@ -159,16 +168,20 @@ class PatientResource extends Resource
                     ->weight(FontWeight::Bold)
 
                     ->fontFamily(FontFamily::Sans),
-                    TextEntry::make('description')
-                    ->color('sucesss')
-                    ->weight(FontWeight::Bold
-            ),
-                    TextEntry::make('schedule.formatted_time')
-                    ->label('Scheduled Time'),
-                    TextEntry::make('created_at')
-                    ->label('Created At')
-                    ->icon('heroicon-m-calendar')
-                    ->iconColor('primary'),
+                TextEntry::make('description')
+                    ->color('primary')
+                    ->icon('heroicon-o-document-text')
+                    ->weight(
+                        FontWeight::Bold
+
+
+                    ),
+                // TextEntry::make('schedule.formatted_time')
+                // ->label('Scheduled Time'),
+                // TextEntry::make('created_at')
+                // ->label('Created At')
+                // ->icon('heroicon-m-calendar')
+                // ->iconColor('primary'),
                 TextEntry::make('updated_at')
                     ->label('Updated At')
                     ->icon('heroicon-m-calendar')

@@ -30,13 +30,20 @@ class AdminPanelProvider extends PanelProvider
     {
         return $panel
             ->default()
+            ->colors([
+                'primary' => Color::Green,
+            ])
             ->id('admin')
             ->path('admin')
             ->login()
+
              //->brandName('𝓗𝓪𝓷𝓪𝓰 𝓗𝓸𝓼𝓹𝓲𝓽𝓪𝓵')
 
-            ->brandLogo(asset('images/hanag.png'))
+            ->brandLogo(asset('images/hanags.png'))
             ->brandLogoHeight('60px')
+
+            ->breadcrumbs(false)
+            
 
             ->registration(Register::class)
             ->databaseNotifications()
@@ -58,14 +65,17 @@ class AdminPanelProvider extends PanelProvider
                     ->icon('heroicon-o-user'),
             ])
             ->colors([
-                'primary' => Color::Amber,
-                'secondary' => Color::Blue,
+                'primary' => Color::Green,
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
+
             ->pages([
 
                Pages\Dashboard::class,
+            ])
+            ->colors([
+                'primary' => Color::Green,
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([

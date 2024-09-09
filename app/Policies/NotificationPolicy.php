@@ -14,7 +14,7 @@ class NotificationPolicy
     public function viewAny(User $user): bool
     {
         //
-        return $user->role === 'patient' || $user->role === 'admin';
+        return $user->role === 'patient';
     }
 
     /**
@@ -23,7 +23,7 @@ class NotificationPolicy
     public function view(User $user, Notification $notification): bool
     {
         //
-        return $user->role === 'patient' || $user->role === 'admin';
+        return $user->role === 'patient';
     }
 
     /**

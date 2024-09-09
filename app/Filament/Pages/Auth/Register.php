@@ -32,9 +32,8 @@ class Register extends BaseRegister
             ->options([
                 'patient' => 'patient',
                 'doctor' => 'doctor',
-                'admin'=>'admin'
             ])
-            ->default('admin')
+            ->default('patient')
             ->required();
     }
 }

@@ -63,7 +63,6 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('id')
                 ->label('ID'),
                 Tables\Columns\TextColumn::make('name')
-
                     ->searchable(),
                 Tables\Columns\TextColumn::make('role')
                 ->searchable(),

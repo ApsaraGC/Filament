@@ -43,69 +43,82 @@ class AppointmentResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
-        ->schema([
-            Forms\Components\Select::make('patient_id')
-                ->label('Patient')
-                ->options(function () {
-                    $patients = Patient::with('user')->get();
-                    return $patients->pluck('user.name', 'id')->filter(function ($name) {
-                        return !is_null($name);
-                    })->toArray();
-                })
-                ->required(),
-            Forms\Components\Select::make('department_id')
-            ->label('Department')
-            ->options(function () {
-                return Department::all()->pluck('name', 'id')->toArray();
-            })
-            ->required()
-            ->reactive()
-            ->afterStateUpdated(function ($state, callable $set) {
-                $set('doctor_id', null);
-            }),
+            ->schema([
+                Forms\Components\Select::make('patient_id')
+                    ->label('Patient')
+                    ->options(function () {
+                        // Get the currently logged-in user
+                        $user = auth()->user();
 
-        Forms\Components\Select::make('doctor_id')
-            ->label('Doctor')
-            ->options(function (callable $get) {
-                $departmentId = $get('department_id');
-                if ($departmentId) {
-                    return Doctor::where('department_id', $departmentId)
-                        ->with('user')
-                        ->get()
-                        ->pluck('user.name', 'id')
-                        ->filter(function ($name) {
-                            return !is_null($name);
-                        })->toArray();
-                }
-                return [];
-            })
-            ->required()
-            ->required()
-                ->reactive()
-                ->afterStateUpdated(function ($state, callable $set) {
-                    $set('schedule_id', null);
-                }),
+                        // Retrieve the patient's information for the logged-in user only
+                        $patient = Patient::where('user_id', $user->id)->with('user')->first();
 
-            Forms\Components\TextInput::make('status')
-                ->required(),
-            Forms\Components\DateTimePicker::make('date_time')
-                ->required(),
-            // Forms\Components\TextInput::make('appointment_date')
-            //     ->required(),
+                        // Return the patient's name as the only option
+                        return $patient ? [$patient->id => $patient->user->name] : [];
+                    })
+                    ->required(),
+
+                // Forms\Components\Select::make('patient_id')
+                //     ->label('Patient')
+                //     ->options(function () {
+                //         $patients = Patient::with('user')->get();
+                //         return $patients->pluck('user.name', 'id')->filter(function ($name) {
+                //             return !is_null($name);
+                //         })->toArray();
+                //     })
+                //     ->required(),
+                Forms\Components\Select::make('department_id')
+                    ->label('Department')
+                    ->options(function () {
+                        return Department::all()->pluck('name', 'id')->toArray();
+                    })
+                    ->required()
+                    ->reactive()
+                    ->afterStateUpdated(function ($state, callable $set) {
+                        $set('doctor_id', null);
+                    }),
+
+                Forms\Components\Select::make('doctor_id')
+                    ->label('Doctor')
+                    ->options(function (callable $get) {
+                        $departmentId = $get('department_id');
+                        if ($departmentId) {
+                            return Doctor::where('department_id', $departmentId)
+                                ->with('user')
+                                ->get()
+                                ->pluck('user.name', 'id')
+                                ->filter(function ($name) {
+                                    return !is_null($name);
+                                })->toArray();
+                        }
+                        return [];
+                    })
+                    ->required()
+
+                    ->reactive()
+                    ->afterStateUpdated(function ($state, callable $set) {
+                        $set('schedule_id', null);
+                    }),
+
+                Forms\Components\TextInput::make('status')
+                    ->required(),
+                Forms\Components\DateTimePicker::make('date_time')
+                    ->required(),
+
                 // Table to display schedules
-            Forms\Components\Placeholder::make('schedules_table')
-            ->label('Doctor’s Schedules')
-            ->content(function (callable $get) {
-                $doctorId = $get('doctor_id');
-                if ($doctorId) {
-                    $schedules = Schedule::where('doctor_id', $doctorId)->get();
-                    return view('partials.schedules_table', ['schedules' => $schedules]);
-                }
-                return '';
-            }),
+                Forms\Components\Placeholder::make('schedules_table')
+                    ->label('Doctor’s Schedules')
+                    ->content(function (callable $get) {
+                        $doctorId = $get('doctor_id');
+                        if ($doctorId) {
+                            $schedules = Schedule::where('doctor_id', $doctorId)->get();
+                            return view('partials.schedules_table', ['schedules' => $schedules]);
+                        }
+                        return '';
+                    }),
 
 
-        ]);;
+            ]);;
     }
     public static function table(Table $table): Table
     {
@@ -114,17 +127,17 @@ class AppointmentResource extends Resource
         $isPatient = $user->hasRole('patient');
         //$doctorId = $isDoctor ? Doctor::where('user_id', $user->id)->value('id') : null;
         return $table
-        ->modifyQueryUsing(function (Builder $query) use ($isDoctor, $isPatient, $user) {
-            if ($isDoctor) {
-                $doctorId = Doctor::where('user_id', $user->id)->value('id');
-                $query->where('doctor_id', $doctorId);
-            } elseif ($isPatient) {
-                $patientId = Patient::where('user_id', $user->id)->value('id');
-                $query->where('patient_id', $patientId);
-            } elseif (auth()->user()->role === 'admin') {
-                // Admins can see all appointments
-            }
-        })
+            ->modifyQueryUsing(function (Builder $query) use ($isDoctor, $isPatient, $user) {
+                if ($isDoctor) {
+                    $doctorId = Doctor::where('user_id', $user->id)->value('id');
+                    $query->where('doctor_id', $doctorId);
+                } elseif ($isPatient) {
+                    $patientId = Patient::where('user_id', $user->id)->value('id');
+                    $query->where('patient_id', $patientId);
+                } elseif (auth()->user()->role === 'admin') {
+                    // Admins can see all appointments
+                }
+            })
             ->columns([
                 Tables\Columns\TextColumn::make('patient.user.name')
                     ->label('Patient Name')
@@ -150,14 +163,18 @@ class AppointmentResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-            Tables\Actions\Action::make('Reshedule')
+                Tables\Actions\EditAction::make()
+                    ->icon('heroicon-o-pencil')
+                    ->color('primary')
+                    ->button(),
+                Tables\Actions\Action::make('Reshedule')
+
                     ->visible(fn($record) => auth()->user()->role === 'doctor')
                     ->form(function ($record) {
                         return [
                             DateTimePicker::make('date_time')
                                 ->default($record->date_time)
-                                // ->native(false)
+                            // ->native(false)
                         ];
                     })
                     ->action(function ($record, $data) {
@@ -165,8 +182,9 @@ class AppointmentResource extends Resource
                         $record->date_time = $data['date_time'];
                         $record->save();
                         Notification::make()
-                            ->title('Appointment rescheduled')
-                            ->body("Hello "   .$record->patient->user->name." your appointment scheduled for " . $previouse_date_time . " with " . $record->doctor->user->name . " has been rescheduled for " . $record->date_time .
+                            ->title('Appointment Rescheduled')
+
+                            ->body("Hello "   . $record->patient->user->name . " your appointment scheduled for " . $previouse_date_time . " with Dr." . $record->doctor->user->name . " has been rescheduled for " . $record->date_time .
                                 "Apologies for the inconvenience. Please check the new time. Thank you!")
                             ->success()
                             ->duration(10)
@@ -175,7 +193,12 @@ class AppointmentResource extends Resource
                         event(new DatabaseNotificationsSent($record->patient->user));
                     })
                     ->icon('heroicon-m-clock')
-                    ->color('warning'),
+                    ->color('warning')
+                    ->button(),
+                Tables\Actions\ViewAction::make()
+                    ->icon('heroicon-o-eye')
+                    ->color('success')
+                    ->button()
 
             ])
             ->filters([
@@ -229,24 +252,15 @@ class AppointmentResource extends Resource
                     })
 
             ])
-
-
-
-
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ])
-            // ->query(function (Builder $query) use ($doctorId) {
-            //     if ($doctorId) {
-            //         $query->where('doctor_id', $doctorId);
-            //     }
-            // })
-            ;
 
+        ;
     }
-//
+    //
     public static function infolist(Infolist $infolist): Infolist
     {
         return $infolist
@@ -254,14 +268,23 @@ class AppointmentResource extends Resource
                 Section::make('Appointment Details')
                     ->schema([
                         TextEntry::make('patient.user.name')
-                            ->label('Patient Name'),
+                            ->label('Patient Name')
+                            ->icon('heroicon-m-user')
+                            ->color('primary'),
                         TextEntry::make('doctor.user.name')
-                            ->label('Doctor Name'),
+                            ->label('Doctor Name')
+                            ->icon('heroicon-m-user')
+                            ->color('primary'),
                         TextEntry::make('department.name')
-                            ->label('Department Name'),
+                            ->label('Department Name')
+                            ->icon('heroicon-o-home')
+                            ->color('primary'),
                         TextEntry::make('status')
-                            ->label('Status'),
+                            ->label('Status')
+                            ->color('primary'),
                         TextEntry::make('date_time')
+                            ->icon('heroicon-m-calendar')
+                            ->color('primary')
                             ->label('Appointment Date & Time')
                             ->dateTime(),
                     ]),
@@ -269,9 +292,14 @@ class AppointmentResource extends Resource
                     ->schema([
                         TextEntry::make('created_at')
                             ->label('Created At')
+                            ->icon('heroicon-m-calendar')
+                            ->color('primary')
                             ->dateTime(),
                         TextEntry::make('updated_at')
                             ->label('Updated At')
+                            ->icon('heroicon-m-calendar')
+                            ->color('primary')
+
                             ->dateTime(),
                     ]),
             ]);

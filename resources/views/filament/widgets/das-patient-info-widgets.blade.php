@@ -20,13 +20,13 @@
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     color: #ffffff;
-    height: 400px;
+    height: 350px;
 }
 
 h2{
     margin-top: 10px;
-    font-size: 80px;
-    color:rgb(210, 67, 210);
+    font-size: 70px;
+    color:rgb(57, 24, 222);
 }
 
 .patient-profile {

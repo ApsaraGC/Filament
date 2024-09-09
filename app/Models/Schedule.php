@@ -22,11 +22,6 @@ class Schedule extends Model
     public function doctor(){
         return $this->belongsTo(Doctor::class);
     }
-     // Add this method to your Schedule model
-//      public function getFormattedTimeAttribute()
-// {
-//     return $this->available_from->format('Y-m-d H:i') . ' - ' . $this->available_to->format('Y-m-d H:i');
-//    //return Carbon::parse($this->available_from->format('Y-m-d H:i') . ' - ' .$this->available_to->format('Y-m-d H:i') );
-// }
+     
 
 }

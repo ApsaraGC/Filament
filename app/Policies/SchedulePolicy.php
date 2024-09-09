@@ -14,7 +14,7 @@ class SchedulePolicy
     public function viewAny(User $user): bool
     {
         //
-        return  $user->role === 'doctor' || $user->role === 'admin';
+        return  $user->role === 'doctor';
     }
 
     /**

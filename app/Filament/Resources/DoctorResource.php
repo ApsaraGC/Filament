@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\DoctorResource\Pages;
 use App\Filament\Resources\DoctorResource\RelationManagers;
 use App\Models\Doctor;
+use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -30,9 +31,13 @@ class DoctorResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('user_id')
-                    ->required()
-                    ->numeric(),
+                // Forms\Components\TextInput::make('user_id')
+                //     ->required()
+                //     ->numeric(),
+                    Forms\Components\Select::make('user_id')
+                    ->options(User::where('role', 'doctor')->pluck('name', 'id'))
+                    ->label('Doctor Name')
+                    ->required(),
                 Forms\Components\TextInput::make('position')
                     ->required(),
                 Forms\Components\TextInput::make('gender')
@@ -97,7 +102,10 @@ class DoctorResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                ->icon('heroicon-o-pencil')
+                ->color('primary')
+                ->button(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -134,23 +142,25 @@ class DoctorResource extends Resource
 
                         TextEntry::make("id")
                         ->label('Doctor ID')
-                        ->color('secondary')
-                        ->weight(FontWeight::Light)
+                        ->color('primary')
+                        ->icon('heroicon-o-identification')
+                        ->weight(FontWeight::Bold)
                         ->fontFamily(FontFamily::Serif),
                         TextEntry::make('position')
                         ->label('Position')
-                        ->color('info')
+                        ->color('primary')
                         ->weight(FontWeight::Medium)
                         ->fontFamily(FontFamily::Mono),
                         TextEntry::make('gender')
                         ->label('Gender')
+                        ->icon('heroicon-o-user')
                         ->weight(FontWeight::Bold)
                         ->fontFamily(FontFamily::Sans)
                         ->color('success'),
                         TextEntry::make('shift')
                         ->label('Shift')
 
-                        ->color('warning')
+                        ->color('primary')
                          ->weight(FontWeight::Bold)
                         ->fontFamily(FontFamily::Serif),
                         ImageEntry::make('image')
@@ -159,6 +169,7 @@ class DoctorResource extends Resource
                         ->height(50)
                         ,
                         TextEntry::make('phone_number')
+                        ->icon('heroicon-o-phone')
                          ->label('Phone Number')
                         ->color('success')
                         ->weight(FontWeight::Bold)

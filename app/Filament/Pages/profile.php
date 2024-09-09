@@ -83,7 +83,7 @@ class profile extends Page implements HasForms
             $schema = array_merge($schema, [
                 DatePicker::make('patient.birth_date')
                     ->required()
-                    ->default($user->patient->dob ?? ''),
+                    ->default($user->patient->birth_date ?? ''),
                 TextInput::make('patient.age')
                     ->required()
                     ->numeric()
