@@ -41,7 +41,8 @@ class AppointmentResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-calendar';
 
     public static function form(Form $form): Form
-    {
+    {  $user = Auth::user();
+        $isDoctor = $user->hasRole('doctor');
         return $form
             ->schema([
                 Forms\Components\Select::make('patient_id')
@@ -100,8 +101,14 @@ class AppointmentResource extends Resource
                         $set('schedule_id', null);
                     }),
 
+                // Forms\Components\TextInput::make('status')
+                //     ->required(),
                 Forms\Components\TextInput::make('status')
-                    ->required(),
+                ->label('Status')
+                ->default($isDoctor ? 'open' : 'pending')
+               // ->disabled($isDoctor) // Doctors might not change status during creation
+                ->required(),
+
                 Forms\Components\DateTimePicker::make('date_time')
                     ->required(),
 
@@ -148,8 +155,18 @@ class AppointmentResource extends Resource
                 Tables\Columns\TextColumn::make('department.name')
                     ->label('Deparmtent Name')
                     ->sortable(),
+                // Tables\Columns\TextColumn::make('status')
+                //     ->searchable(),
                 Tables\Columns\TextColumn::make('status')
-                    ->searchable(),
+                ->label('Status')
+                ->formatStateUsing(function ($state, $record) use ($isDoctor) {
+                    if ($isDoctor) {
+                        // Logic for displaying status based on doctor's profile
+                        return $record->status;
+                    }
+                    return $state;
+                })
+                ->searchable(),
                 Tables\Columns\TextColumn::make('date_time')
                     ->dateTime()
                     ->sortable(),
@@ -187,7 +204,7 @@ class AppointmentResource extends Resource
                             ->body("Hello "   . $record->patient->user->name . " your appointment scheduled for " . $previouse_date_time . " with Dr." . $record->doctor->user->name . " has been rescheduled for " . $record->date_time .
                                 "Apologies for the inconvenience. Please check the new time. Thank you!")
                             ->success()
-                            ->duration(10)
+                            ->duration(15)
 
                             ->sendToDatabase($record->patient->user);
                         event(new DatabaseNotificationsSent($record->patient->user));
@@ -195,9 +212,10 @@ class AppointmentResource extends Resource
                     ->icon('heroicon-m-clock')
                     ->color('warning')
                     ->button(),
+
                 Tables\Actions\ViewAction::make()
                     ->icon('heroicon-o-eye')
-                    ->color('success')
+                    ->color('primary')
                     ->button()
 
             ])
@@ -252,6 +270,7 @@ class AppointmentResource extends Resource
                     })
 
             ])
+
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),

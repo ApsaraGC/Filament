@@ -1,40 +1,37 @@
-<!-- resources/views/filament/widgets/das-patient-info-widgets.blade.php -->
-
 <x-filament-widgets::widget>
     <x-filament::section>
-        <div class="widget-content" style="background-image: url('images/hospital.jpg'); background-size: cover; background-position: center; padding: 20px; color: #fff;">
-            <h2>𝔸𝕝𝕨𝕒𝕪𝕤 𝔹𝕖 ℍ𝕖𝕒𝕝𝕥𝕙𝕪 𝕒𝕟𝕕 𝕊𝕒𝕗𝕖 . </h2>
-
-            <!-- Additional content can go here -->
+        <div class="custom-widget bg-cover bg-center p-6 rounded-lg shadow-md">
+            <h2>𝓗𝓮𝓵𝓵𝓸 𝓟𝓪𝓽𝓲𝓮𝓷𝓽</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                @foreach ($this->getStats() as $stat)
+                    <div class="stat-card p-4 bg-white bg-opacity-80 rounded-lg shadow-md">
+                        <h3 class="text-lg font-bold">{{ $stat->getLabel() }}</h3>
+                        <p class="text-4xl font-extrabold text-{{ $stat->getColor() }}">{{ $stat->getValue() }}</p>
+                        <p class="text-sm text-gray-700">{{ $stat->getDescription() }}</p>
+                        {{-- Include chart or additional information if needed --}}
+                    </div>
+                @endforeach
+            </div>
         </div>
-        <!-- Example of displaying patient profile information -->
-{{-- <div class="patient-profile">
-    <h3>Patient Profile</h3>
-    <p>Name: {{ $user->name }}</p>
-    <p>Age: {{ $user->age }}</p>
-    <p>Address: {{ $user->address }}</p>
-</div> --}}
-<style>
-    /* resources/css/widget.css */
-.widget-content {
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    color: #ffffff;
-    height: 350px;
-}
-
-h2{
-    margin-top: 10px;
-    font-size: 70px;
-    color:rgb(57, 24, 222);
-}
-
-.patient-profile {
-    margin-top: 20px;
-}
-
-</style>
-
-
+        <style>
+            .custom-widget {
+                background-image: url('images/patient.jpg');
+                height: 300px;
+                padding: 2.5rem;
+                border-radius: 0.75rem;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            }
+            .stat-card {
+                background-color: rgba(255, 255, 255, 0.8); /* White background with some transparency */
+                border-radius: 10px;
+                padding: 30px;
+            }
+            h2 {
+                margin-top: 10px;
+                font-size: 60px;
+                color: rgb(210, 67, 210);
+                text-align: center;
+            }
+        </style>
     </x-filament::section>
 </x-filament-widgets::widget>

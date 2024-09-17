@@ -20,6 +20,7 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 use App\Filament\Pages\Auth\Register;
 use App\Filament\Pages\profile;
 use App\Filament\Widgets\DasAdminInfoWidgets;
+use App\Filament\Widgets\DasChartWidget;
 use App\Filament\Widgets\DasDoctorInfoWidgets;
 use App\Filament\Widgets\DasPatientInfoWidgets;
 use Filament\Navigation\MenuItem;
@@ -43,7 +44,7 @@ class AdminPanelProvider extends PanelProvider
             ->brandLogoHeight('60px')
 
             ->breadcrumbs(false)
-            
+
 
             ->registration(Register::class)
             ->databaseNotifications()
@@ -57,6 +58,9 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->widgets([
                 DasAdminInfoWidgets::class,
+            ])
+            ->widgets([
+                
             ])
             ->userMenuItems([
                 MenuItem::make()

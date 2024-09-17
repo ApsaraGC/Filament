@@ -41,13 +41,15 @@ class PatientResource extends Resource
                 Forms\Components\TextInput::make('number')
                     ->required()
                     ->label('Phone Number')
-
+                    ->maxLength(10)
+                    ->minLength(10)
                     ->numeric(),
                 Forms\Components\TextInput::make('age')
                     ->required()
                     ->numeric(),
                 Forms\Components\DatePicker::make('birth_date')
-                    ->required(),
+                    ->required()
+                    ,
                 Forms\Components\Select::make('gender')
                     ->options([
                         'male' => 'Male',
@@ -168,6 +170,9 @@ class PatientResource extends Resource
                     ->weight(FontWeight::Bold)
 
                     ->fontFamily(FontFamily::Sans),
+                TextEntry::make('age')
+                ->color('success')
+                ->icon('heroicon-m-calendar'),
                 TextEntry::make('description')
                     ->color('primary')
                     ->icon('heroicon-o-document-text')
